@@ -5,12 +5,18 @@ pipeline{
 
     stages {
         stage("1. Git Checkout") {
-                when { expression {  params.action == 'create' } }
             steps{
             gitCheckout(
                 branch: "main",
                 url: "https://github.com/nasirpatel1957/mrdevops_java_app.git"
             )
+            }
+        }
+
+        stage("2. Maven Unit Test") {
+            steps{
+                script {
+                    mvnTest()
             }
         }
     }
