@@ -4,10 +4,10 @@ pipeline{
     agent any 
 
     parameters{
-        choice(name: 'action', choices: 'create\ndelete', description: 'Choose option')
-        string(name: "hubUser", description: "Dockerhub UserName", defaultValue: "nhp1993")
-        string(name: "project", description: "Project Name", defaultValue: "java-app")
-        string(name: "version", description: "Version Name", defaultValue: "v1")
+        choice(name: 'Action', choices: 'create\ndelete', description: 'Choose option for Pipeline')
+        string(name: "HubUser", description: "Dockerhub UserName", defaultValue: "nhp1993")
+        string(name: "Project", description: "Project Name", defaultValue: "java-app")
+        string(name: "Version", description: "Version Name", defaultValue: "v1")
     }
 
     stages {
@@ -74,7 +74,7 @@ pipeline{
          when { expression {  params.action == 'create' } }
             steps{
                script{
-                   DockerBuild("${params.hubUser}", "${params.project}", "${params.version}")
+                   DockerBuild("${params.HubUser}", "${params.Project}", "${params.Version}")
                }
             }
         } 
@@ -83,10 +83,20 @@ pipeline{
          when { expression {  params.action == 'create' } }
             steps{
                script{
-                   DockerScanTrivy("${params.hubUser}", "${params.project}", "${params.version}")
+                   DockerScanTrivy("${params.HubUser}", "${params.Project}", "${params.Version}")
                }
             }
         } 
+
+        stage('9. Docker Image Push'){
+         when { expression {  params.action == 'create' } }
+            steps{
+               script{
+                   DockerPush("${params.HubUser}", "${params.Project}", "${params.Version}")
+               }
+            }
+        } 
+
 
     }
 }
