@@ -5,6 +5,9 @@ pipeline{
 
     parameters{
         choice(name: 'action', choices: 'create\ndelete', description: 'Choose option')
+        string(name: "hubUser", description: "Dockerhub UserName", defaultValue: "nhp1993")
+        string(name: "project", description: "Project Name", defaultValue: "java-app")
+        string(name: "version", description: "Version Name", defaultValue: "v1")
     }
 
     stages {
@@ -18,47 +21,47 @@ pipeline{
             }
         }
 
-        stage("2. Maven Unit Test") {
-        when { expression { params.action == 'create' } }
-            steps{
-                script{
-                    mvnTest()
-            }
-        }
-    }
+    //     stage("2. Maven Unit Test") {
+    //     when { expression { params.action == 'create' } }
+    //         steps{
+    //             script{
+    //                 mvnTest()
+    //         }
+    //     }
+    // }
 
-        stage("3. Maven Integration Test") {
-        when { expression { params.action == 'create' } }
-            steps{
-                script{
-                    mvnIntegration()
-            }
-        }
-    }
+    //     stage("3. Maven Integration Test") {
+    //     when { expression { params.action == 'create' } }
+    //         steps{
+    //             script{
+    //                 mvnIntegration()
+    //         }
+    //     }
+    // }
 
-    stage('4. Static code analysis: Sonarqube'){
-         when { expression {  params.action == 'create' } }
-            steps{
-               script{
+    //     stage('4. Static code analysis: Sonarqube'){
+    //      when { expression {  params.action == 'create' } }
+    //         steps{
+    //            script{
                    
-                   def SonarQubecredentialsId = 'sonar-api'
-                   staticCodeAnalysis(SonarQubecredentialsId)
-               }
-            }
-        }
+    //                def SonarQubecredentialsId = 'sonar-api'
+    //                staticCodeAnalysis(SonarQubecredentialsId)
+    //            }
+    //         }
+    //     }
 
-    stage('5. Quality Gate Status Check : Sonarqube'){
-         when { expression {  params.action == 'create' } }
-            steps{
-               script{
+    //     stage('5. Quality Gate Status Check : Sonarqube'){
+    //      when { expression {  params.action == 'create' } }
+    //         steps{
+    //            script{
                    
-                   def SonarQubecredentialsId = 'sonar-api'
-                   QualityGateStatus(SonarQubecredentialsId)
-               }
-            }
-        }
+    //                def SonarQubecredentialsId = 'sonar-api'
+    //                QualityGateStatus(SonarQubecredentialsId)
+    //            }
+    //         }
+    //     }
 
-    stage('6. Maven Build'){
+        stage('6. Maven Build'){
          when { expression {  params.action == 'create' } }
             steps{
                script{
@@ -66,5 +69,14 @@ pipeline{
                }
             }
         }    
+
+        stage('7. Docker Image Build'){
+         when { expression {  params.action == 'create' } }
+            steps{
+               script{
+                   DockerBuild("${params.hubUser}", "${params.project}", "${params.version}")
+               }
+            }
+        } 
     }
 }
