@@ -36,16 +36,16 @@ pipeline{
         }
     }
 
-    // stage('4. Static code analysis: Sonarqube'){
-    //      when { expression {  params.action == 'create' } }
-    //         steps{
-    //            script{
+    stage('4. Static code analysis: Sonarqube'){
+         when { expression {  params.action == 'create' } }
+            steps{
+               script{
                    
-    //                def SonarQubecredentialsId = 'sonar-api'
-    //                staticCodeAnalysis(SonarQubecredentialsId)
-    //            }
-    //         }
-    //     }
+                   def SonarQubecredentialsId = 'sonar-api'
+                   staticCodeAnalysis(SonarQubecredentialsId)
+               }
+            }
+        }
 
     stage('5. Quality Gate Status Check : Sonarqube'){
          when { expression {  params.action == 'create' } }
@@ -57,5 +57,14 @@ pipeline{
                }
             }
         }
-}
+
+    stage('6. Maven Build'){
+         when { expression {  params.action == 'create' } }
+            steps{
+               script{
+                   mvnBuild()
+               }
+            }
+        }    
+    }
 }
