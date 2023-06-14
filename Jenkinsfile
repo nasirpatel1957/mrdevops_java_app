@@ -97,6 +97,15 @@ pipeline{
             }
         } 
 
-
+        stage('10. Docker Image Cleanup'){
+         when { expression {  params.action == 'create' } }
+            steps{
+               script{
+                   DockerClean("${params.HubUser}", "${params.Project}", "${params.Version}")
+               }
+            }
+        } 
+    
+    
     }
 }
